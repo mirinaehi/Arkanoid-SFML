@@ -3,12 +3,14 @@
 #include <stdlib.h>
 using namespace sf;
 
+#define GAME_OVER -1
+
 inline bool isCollide(Sprite s1, Sprite s2);
 
-void main(void)
+int main(void)
 {
 	srand(time(nullptr));
-	RenderWindow app(VideoMode(520, 450), "Arkanoid");
+	RenderWindow app(VideoMode(520, 700), "Arkanoid");
 	app.setFramerateLimit(60);
 
 	// 텍스쳐 load
@@ -19,9 +21,10 @@ void main(void)
 	t4.loadFromFile("images/paddle.png");
 
 	// image 배치
-	Sprite sBackground(t2), sBall(t3), sPaddle(t4);
-	sPaddle.setPosition(300, 400);
-	sBall.setPosition(300, 300);
+	Sprite sBackground(t2, IntRect(0, 0, 520, 700)), sBall(t3), sPaddle(t4);
+	
+	sPaddle.setPosition(300, 610);
+	sBall.setPosition(300, 600);
 
 	Sprite block[1000];
 	int n = 0;
@@ -61,9 +64,11 @@ void main(void)
 
 		// 공의 boundary 설정
 		Vector2f b = sBall.getPosition();
+		if (b.y > 700)
+			return GAME_OVER;
 		if (b.x < 0 || b.x > 520)
 			dx = -dx;
-		if (b.y < 0 || b.y > 450)
+		if (b.y < 0)
 			dy = -dy;
 
 		// paddle 움직이고, 공과의 충돌처리
@@ -85,6 +90,7 @@ void main(void)
 
 		app.display();
 	}
+	return 0;
 }
 
 // 사각충돌
