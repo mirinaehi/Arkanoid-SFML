@@ -1,11 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include <time.h>
+#include <stdlib.h>
 using namespace sf;
 
-bool isCollide(Sprite s1, Sprite s2);
+inline bool isCollide(Sprite s1, Sprite s2);
 
 void main(void)
 {
+	srand(time(nullptr));
 	RenderWindow app(VideoMode(520, 450), "Arkanoid");
 	app.setFramerateLimit(60);
 
@@ -64,6 +66,14 @@ void main(void)
 		if (b.y < 0 || b.y > 450)
 			dy = -dy;
 
+		// paddle 움직이고, 공과의 충돌처리
+		if (Keyboard::isKeyPressed(Keyboard::Right))
+			sPaddle.move(6.0f, 0.0f);
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+			sPaddle.move(-6.0f, 0.0f);
+		if (isCollide(sPaddle, sBall))
+			dy = -(rand() % 5 + 2);
+
 
 		app.clear();
 		app.draw(sBackground);
@@ -78,7 +88,7 @@ void main(void)
 }
 
 // 사각충돌
-bool isCollide(Sprite s1, Sprite s2)
+inline bool isCollide(Sprite s1, Sprite s2)
 {
 	return s1.getGlobalBounds().intersects(s2.getGlobalBounds());
 }
