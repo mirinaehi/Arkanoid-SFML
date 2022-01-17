@@ -2,17 +2,21 @@
 #include <time.h>
 using namespace sf;
 
+bool isCollide(Sprite s1, Sprite s2);
+
 void main(void)
 {
 	RenderWindow app(VideoMode(520, 450), "Arkanoid");
 	app.setFramerateLimit(60);
 
+	// 텍스쳐 load
 	Texture t1, t2, t3, t4;
 	t1.loadFromFile("images/block01.png");
 	t2.loadFromFile("images/background.jpg");
 	t3.loadFromFile("images/ball.png");
 	t4.loadFromFile("images/paddle.png");
 
+	// image 배치
 	Sprite sBackground(t2), sBall(t3), sPaddle(t4);
 	sPaddle.setPosition(300, 400);
 	sBall.setPosition(300, 300);
@@ -25,6 +29,9 @@ void main(void)
 			block[n].setPosition(i * 43, j * 20);
 			n++;
 		}
+	// 공의 발사각도
+	float dx = 6.0f, dy = 5.0f;
+
 
 	while(app.isOpen()) {
 		Event e;
@@ -32,6 +39,32 @@ void main(void)
 			if (e.type == Event::Closed)
 				app.close();
 		}
+
+		// 공이 벽돌과 충돌하면 벽돌을 없애고, 공의 방향은 반대로
+		sBall.move(dx, 0);
+		for (int i = 0; i < n; i++) {
+			if (isCollide(sBall, block[i])) {
+				block[i].setPosition(-100, 0);
+				dx = -dx;
+			}
+		}
+
+		sBall.move(0, dy);
+		for (int i = 0; i < n; i++) {
+			if (isCollide(sBall, block[i])) {
+				block[i].setPosition(-100, 0);
+				dy = -dy;
+			}
+		}
+
+		// 공의 boundary 설정
+		Vector2f b = sBall.getPosition();
+		if (b.x < 0 || b.x > 520)
+			dx = -dx;
+		if (b.y < 0 || b.y > 450)
+			dy = -dy;
+
+
 		app.clear();
 		app.draw(sBackground);
 		app.draw(sBall);
@@ -42,6 +75,12 @@ void main(void)
 
 		app.display();
 	}
+}
+
+// 사각충돌
+bool isCollide(Sprite s1, Sprite s2)
+{
+	return s1.getGlobalBounds().intersects(s2.getGlobalBounds());
 }
 
 //int main()
